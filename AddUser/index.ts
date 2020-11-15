@@ -61,9 +61,13 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                     playlist,
                     last_sync: 0 // sync all tracks
                 });
-
+                
                 context.res = {
-                    body: "Enjoy!"
+                    status: 302,
+                    headers: {
+                        location: `http://open.spotify.com/user/spotify/playlist/${playlist}`
+                    },
+                    body: null
                 };
             } else {
                 // Update refresh token for existing user - it might have expired
@@ -73,7 +77,11 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 await container.item(id, id).replace(doc);
 
                 context.res = {
-                    body: "You're already being synced..."
+                    status: 302,
+                    headers: {
+                        location: `http://open.spotify.com/user/spotify/playlist/${doc.playlist}`
+                    },
+                    body: null
                 };
             }
         } else {
