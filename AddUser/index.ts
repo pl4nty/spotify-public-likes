@@ -19,9 +19,6 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             spotify.setAccessToken(access_token);
             spotify.setRefreshToken(refresh_token);
 
-            context.log('The access token is ' + access_token);
-            context.log('The refresh token is ' + refresh_token);
-
             const cosmos = new CosmosClient({
                 endpoint: process.env.COSMOSDB_ENDPOINT,
                 key: process.env.COSMOSDB_KEY
