@@ -40,7 +40,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 // Create sync playlist
                 // @ts-ignore as types haven't been updated to v5 yet
                 const p = await spotify.createPlaylist(`${user.display_name}'s Likes`, {
-                    description: `Songs liked by ${user.display_name}.`,
+                    description: `Songs liked by ${user.display_name}, synced by spotify.tplant.com.au.`,
                     public: true
                 });
 
