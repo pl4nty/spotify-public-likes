@@ -10,7 +10,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     const spotify = new Spotify({
         clientId: process.env.SPOTIFY_CLIENT_ID,
-        redirectUri: `${req.url.split('/').slice(0,3).join('/')}/AddUser`
+        redirectUri: `${process.env.WEBSITE_HOSTNAME}/AddUser`
     });
 
     context.log(process.env);
