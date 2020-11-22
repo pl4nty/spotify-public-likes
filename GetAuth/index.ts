@@ -12,6 +12,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         clientId: process.env.SPOTIFY_CLIENT_ID,
         redirectUri: `${req.url.split('/').slice(0,3).join('/')}/AddUser`
     });
+
+    context.log(process.env);
     
     context.res = {
         status: 302,
