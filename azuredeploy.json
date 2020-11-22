@@ -200,7 +200,7 @@
             "apiVersion": "2020-06-01-preview",
             "name": "[concat(variables('db_name'), '/', variables('db_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', concat(variables('db_name'), '/', variables('db_name')))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))]",
                 "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('db_name'))]"
             ],
             "properties": {
@@ -214,7 +214,7 @@
             "apiVersion": "2020-06-01-preview",
             "name": "[concat(variables('db_name'), '/', variables('db_name'), '/users')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', concat(variables('db_name'), '/', variables('db_name')))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))]",
                 "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('db_name'))]"
             ],
             "properties": {
@@ -423,8 +423,8 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('microsoft.insights/components', variables('insight_name'))]",
-                "[resourceId('Microsoft.Web/serverfarms', variables('storage_name'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('Website Name'))]",
+                "[resourceId('Microsoft.Web/serverfarms', parameters('Website Name'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]",
                 "[resourceId('microsoft.documentdb/databaseaccounts', variables('db_name'))]"
             ],
             "kind": "functionapp",
@@ -450,11 +450,11 @@
                     "appSettings": [
                         {
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                            "value": "[reference(resourceId('microsoft.insights/components', variables('insight_name')).InstrumentationKey)]"
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('insight_name'))).InstrumentationKey]"
                         },
                         {
                             "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                            "value": "[reference(resourceId('microsoft.insights/components', variables('insight_name')).ConnectionString)]"
+                            "value": "[reference(resourceId('microsoft.insights/components', variables('insight_name'))).ConnectionString]"
                         },
                         {
                             "name": "AzureWebJobsStorage",
@@ -462,11 +462,11 @@
                         },
                         {
                             "name": "COSMOSDB_CONTAINER_ID",
-                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', concat(variables('db_name'), '/', variables('db_name')))).resource.id]"
+                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))).resource.id]"
                         },
                         {
                             "name": "COSMOSDB_DB_ID",
-                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', concat(variables('db_name'), '/', variables('db_name'), '/users'))).resource.id]"
+                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', variables('db_name'), variables('db_name'), 'users')).resource.id]"
                         },
                         {
                             "name": "COSMOSDB_ENDPOINT",
