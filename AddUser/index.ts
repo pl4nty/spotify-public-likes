@@ -55,7 +55,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 });
 
                 // Trigger sync to new playlist
-                axios.post(`${process.env.ENDPOINT}/SyncPlaylist`, {
+                axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist`, {
                     access_token,
                     refresh_token,
                     playlist,
