@@ -17,7 +17,7 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
 
     // Sync each user and update sync timestamp
     users.forEach(async user => {
-        axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist`, user);
+        axios.post(`${req.url.split('/').slice(0,3).join('/')}/SyncPlaylist`, user);
         user.last_sync = (new Date()).toISOString();
         container.item(user.id, user.id).replace(user);
     });

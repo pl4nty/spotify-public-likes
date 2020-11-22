@@ -21,16 +21,13 @@ Want to stop the sync? Just delete the public playlist.
 
 Variable | Description
 -|-
-`SPOTIFY_CLIENT_ID` | 
-`SPOTIFY_CLIENT_SECRET` | 
-`FUNCTION_URL` | URL from the Function's Overview blade
-`COSMOSDB_ENDPOINT` | URI from the DB's Keys blade
+`SPOTIFY_CLIENT_ID` |
+`SPOTIFY_CLIENT_SECRET` |
 `COSMOSDB_KEY` | Primary Key from the DB's Keys blade
-`COSMOSDB_DB_ID` | Defaults to 'spotify'
-`COSMOSDB_CONTAINER_ID` | Defaults to 'users'
 
-5. [Add a redirect URI](https://developer.spotify.com/documentation/general/guides/app-settings/) to your Spotify application in the format `FUNCTION_URL/AddUser`
-6. Download a publish profile file from the Function's Overview blade, using the "Get publish profile" button
+5. Navigate to the Function's Overview blade
+6. Copy the Function URL and [add a redirect URI](https://developer.spotify.com/documentation/general/guides/app-settings/) to your Spotify application in the format `URL/AddUser`
+7. Use the "Get publish profile" button to download a publish profile file
 7. Add the file's contents to your fork as a [GitHub secret](https://docs.github.com/en/free-pro-team@latest/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository), called `AZURE_FUNCTIONAPP_PUBLISH_PROFILE`
 8. Add the Function's name as a GitHub secret, called `AZURE_FUNCTIONAPP_NAME`
 8. [Manually trigger the GitHub Action](https://github.blog/changelog/2020-07-06-github-actions-manual-triggers-with-workflow_dispatch/)
