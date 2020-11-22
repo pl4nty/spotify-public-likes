@@ -3,7 +3,7 @@
 
 Source code for some Azure Functions that sync liked Spotify songs to a public playlist, using CosmosDB for state.
 
-![Sign up with Spotify](https://github.com/pl4nty/spotify-public-likes/blob/main/signup.png?raw=true)
+[![Sign up with Spotify](https://github.com/pl4nty/spotify-public-likes/blob/main/signup.png?raw=true)](https://spotify.tplant.com.au/)
 
 Want to stop the sync? Just delete the public playlist.
 
