@@ -1,7 +1,7 @@
-name: Deploy Node.js project to Azure Function App
+name: Build and deploy to Azure
 
 on:
-  [push, pull_request]
+  [push, pull_request, workflow_dispatch]
 
 # CONFIGURATION
 # For help, go to https://github.com/Azure/Actions
@@ -11,7 +11,6 @@ on:
 #
 # 2. Change these variables for your configuration:
 env:
-  AZURE_FUNCTIONAPP_NAME: spotify-public-likes # set this to your application's name
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'          # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '12.x'                         # set this to the node version to use (supports 8.x, 10.x, 12.x)
 
@@ -39,7 +38,7 @@ jobs:
       uses: Azure/functions-action@v1
       id: fa
       with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+        app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
         package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 

@@ -7,18 +7,16 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         'user-library-read', // read saved tracks
         'playlist-modify-public' // create and write to sync playlist
     ];
-    // TODO generate state string
-    const state = 'some-state-of-my-choice';
 
     const spotify = new Spotify({
         clientId: process.env.SPOTIFY_CLIENT_ID,
-        redirectUri: process.env.SPOTIFY_REDIRECT_URI
+        redirectUri: `${process.env.ENDPOINT}/AddUser`
     });
     
     context.res = {
         status: 302,
         headers: {
-            location: spotify.createAuthorizeURL(scopes, state)
+            location: spotify.createAuthorizeURL(scopes, '')
         },
         body: null
     };

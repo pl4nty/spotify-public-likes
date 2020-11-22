@@ -8,7 +8,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         const spotify = new Spotify({
             clientId: process.env.SPOTIFY_CLIENT_ID,
             clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-            redirectUri: process.env.SPOTIFY_REDIRECT_URI
+            redirectUri: `${process.env.FUNCTION_URL}/AddUser`
         });
 
         const data = await spotify.authorizationCodeGrant(req.query['code']);
@@ -55,7 +55,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 });
 
                 // Trigger sync to new playlist
-                axios.post(process.env.SYNC_ENDPOINT, {
+                axios.post(`${process.env.ENDPOINT}/SyncPlaylist`, {
                     access_token,
                     refresh_token,
                     playlist,
