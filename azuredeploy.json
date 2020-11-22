@@ -477,6 +477,10 @@
                             "value": ""
                         },
                         {
+                            "name": "FUNCTION_URL",
+                            "value": ""
+                        },
+                        {
                             "name": "FUNCTIONS_EXTENSION_VERSION",
                             "value": "~3"
                         },
