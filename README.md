@@ -8,6 +8,7 @@ Source code for some Azure Functions that sync liked Spotify songs to a public p
 Want to stop the sync? Just delete the public playlist.
 
 # Self-hosting
+Note that Functions are hosted on the cheaper Consumption plan by default, so can't be hosted in a VNet and require CosmosDB to be open to the internet.
 ## Prerequisites
 * Azure account
 * Spotify account
@@ -25,6 +26,7 @@ Variable | Description
 `SPOTIFY_CLIENT_SECRET` |
 `COSMOSDB_KEY` | Primary Key from the DB's Keys blade
 `FUNCTION_URL` | URL from the Function's Overview blade
+`FUNCTION_KEY` | Function key from the `SyncPlaylist` function's Function Keys blade 
 
 5. [Add a redirect URI](https://developer.spotify.com/documentation/general/guides/app-settings/) to your Spotify application in the format `FUNCTION_URL/AddUser`
 6. Use the "Get publish profile" button on the Function's Overview blade to download a publish profile file

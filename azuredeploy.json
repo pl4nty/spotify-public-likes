@@ -18,8 +18,7 @@
         "suffix": "[substring(variables('guid'),sub(length(variables('guid')),4),4)]",
         "insight_name": "[concat('insight',variables('suffix'))]",
         "db_name": "[concat('db',variables('suffix'))]",
-        "storage_name": "[concat('storage',variables('suffix'))]",
-        "vnet_name": "[concat('vnet',variables('suffix'))]"
+        "storage_name": "[concat('storage',variables('suffix'))]"
     },
     "resources": [
         {
@@ -37,84 +36,10 @@
             }
         },
         {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-05-01",
-            "name": "[variables('vnet_name')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "10.0.0.0/16"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "default",
-                        "properties": {
-                            "addressPrefix": "10.0.0.0/24",
-                            "serviceEndpoints": [
-                                {
-                                    "service": "Microsoft.AzureCosmosDB",
-                                    "locations": [
-                                        "*"
-                                    ]
-                                }
-                            ],
-                            "delegations": [
-                                {
-                                    "name": "delegation",
-                                    "properties": {
-                                        "serviceName": "Microsoft.Web/serverfarms"
-                                    }
-                                }
-                            ],
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
-                        }
-                    }
-                ],
-                "virtualNetworkPeerings": [],
-                "enableDdosProtection": false,
-                "enableVmProtection": false
-            }
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks/subnets",
-            "apiVersion": "2020-05-01",
-            "name": "[concat(variables('vnet_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet_name'))]"
-            ],
-            "properties": {
-                "addressPrefix": "10.0.0.0/24",
-                "serviceEndpoints": [
-                    {
-                        "service": "Microsoft.AzureCosmosDB",
-                        "locations": [
-                            "*"
-                        ]
-                    }
-                ],
-                "delegations": [
-                    {
-                        "name": "delegation",
-                        "properties": {
-                            "serviceName": "Microsoft.Web/serverfarms"
-                        }
-                    }
-                ],
-                "privateEndpointNetworkPolicies": "Enabled",
-                "privateLinkServiceNetworkPolicies": "Enabled"
-            }
-        },
-        {
             "type": "Microsoft.DocumentDB/databaseAccounts",
             "apiVersion": "2020-06-01-preview",
             "name": "[variables('db_name')]",
             "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), 'default')]"
-            ],
             "tags": {
                 "defaultExperience": "Core (SQL)",
                 "hidden-cosmos-mmspecial": "",
@@ -128,13 +53,8 @@
                 "publicNetworkAccess": "Enabled",
                 "enableAutomaticFailover": false,
                 "enableMultipleWriteLocations": false,
-                "isVirtualNetworkFilterEnabled": true,
-                "virtualNetworkRules": [
-                    {
-                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), 'default')]",
-                        "ignoreMissingVNetServiceEndpoint": false
-                    }
-                ],
+                "isVirtualNetworkFilterEnabled": false,
+                "virtualNetworkRules": [],
                 "disableKeyBasedMetadataWriteAccess": false,
                 "enableFreeTier": "[parameters('Use CosmosDB free tier (1 per subscription)?')]",
                 "enableAnalyticalStorage": false,
@@ -155,23 +75,7 @@
                 ],
                 "cors": [],
                 "capabilities": [],
-                "ipRules": [
-                    {
-                        "ipAddressOrRange": "104.42.195.92"
-                    },
-                    {
-                        "ipAddressOrRange": "40.76.54.131"
-                    },
-                    {
-                        "ipAddressOrRange": "52.176.6.30"
-                    },
-                    {
-                        "ipAddressOrRange": "52.169.50.45"
-                    },
-                    {
-                        "ipAddressOrRange": "52.187.184.26"
-                    }
-                ],
+                "ipRules": [],
                 "backupPolicy": {
                     "type": "Periodic",
                     "periodicModeProperties": {
@@ -184,7 +88,7 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(variables('db_name'), '/', variables('db_name'))]",
+            "name": "[concat(variables('db_name'), '/spotify')]",
             "dependsOn": [
                 "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('db_name'))]"
             ],
@@ -192,19 +96,7 @@
                 "resource": {
                     "id": "spotify"
                 },
-                "options": {}
-            }
-        },
-        {
-            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/throughputSettings",
-            "apiVersion": "2020-06-01-preview",
-            "name": "[concat(variables('db_name'), '/', variables('db_name'), '/default')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))]",
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('db_name'))]"
-            ],
-            "properties": {
-                "resource": {
+                "options": {
                     "throughput": 400
                 }
             }
@@ -212,9 +104,9 @@
         {
             "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
             "apiVersion": "2020-06-01-preview",
-            "name": "[concat(variables('db_name'), '/', variables('db_name'), '/users')]",
+            "name": "[concat(variables('db_name'), '/spotify/users')]",
             "dependsOn": [
-                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), 'spotify')]",
                 "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('db_name'))]"
             ],
             "properties": {
@@ -253,7 +145,7 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2020-08-01-preview",
+            "apiVersion": "2019-06-01",
             "name": "[variables('storage_name')]",
             "location": "[resourceGroup().location]",
             "sku": {
@@ -338,33 +230,21 @@
             "name": "[concat(variables('storage_name'), '/default')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
-            ],
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "properties": {
-                "protocolSettings": {
-                    "smb": {}
-                },
-                "cors": {
-                    "corsRules": []
-                }
-            }
+            ]
         },
         {
             "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-            "apiVersion": "2020-08-01-preview",
-            "name": "[concat(variables('storage_name'), '/default/spotify-public-likes9be2')]",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(variables('storage_name'), '/default/spotify9be2')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts/fileServices', variables('storage_name'), 'default')]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storage_name'))]"
-            ],
-            "properties": {
-                "accessTier": "TransactionOptimized",
-                "shareQuota": 5120,
-                "enabledProtocols": "SMB"
-            }
+            ]
+            // "properties": {
+            //     "accessTier": "TransactionOptimized",
+            //     "shareQuota": 5120,
+            //     "enabledProtocols": "SMB"
+            // }
         },
         {
             "type": "Microsoft.Storage/storageAccounts/queueServices",
@@ -398,13 +278,13 @@
             "name": "[parameters('Website Name')]",
             "location": "[resourceGroup().location]",
             "sku": {
-                "name": "EP1",
-                "tier": "ElasticPremium",
-                "size": "EP1",
-                "family": "EP",
-                "capacity": 1
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
             },
-            "kind": "elastic",
+            "kind": "app",
             "properties": {
                 "perSiteScaling": false,
                 "maximumElasticWorkerCount": 1,
@@ -462,11 +342,11 @@
                         },
                         {
                             "name": "COSMOSDB_CONTAINER_ID",
-                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), variables('db_name'))).resource.id]"
+                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', variables('db_name'), 'spotify')).resource.id]"
                         },
                         {
                             "name": "COSMOSDB_DB_ID",
-                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', variables('db_name'), variables('db_name'), 'users')).resource.id]"
+                            "value": "[reference(resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', variables('db_name'), 'spotify', 'users')).resource.id]"
                         },
                         {
                             "name": "COSMOSDB_ENDPOINT",
@@ -615,84 +495,6 @@
                 "siteName": "[parameters('Website Name')]",
                 "hostNameType": "Verified"
             }
-        },
-        {
-            "type": "Microsoft.Web/sites/virtualNetworkConnections",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('Website Name'), '/', guid(resourceGroup().id, deployment().name), '_default')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('Website Name'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), 'default')]"
-            ],
-            "properties": {
-                "vnetResourceId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet_name'), 'default')]",
-                "isSwift": true
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('Website Name'), '/AddUser')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('Website Name'))]"
-            ]//,
-            // "properties": {
-            //     "script_root_path_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/AddUser/",
-            //     "script_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/dist/AddUser/index.js",
-            //     "config_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/AddUser/function.json",
-            //     "href": "https://spotify-public-likes.azurewebsites.net/admin/functions/AddUser",
-            //     "config": {}
-            // }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('Website Name'), '/GetAuth')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('Website Name'))]"
-            ]//,
-            // "properties": {
-            //     "script_root_path_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/GetAuth/",
-            //     "script_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/dist/GetAuth/index.js",
-            //     "config_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/GetAuth/function.json",
-            //     "href": "https://spotify-public-likes.azurewebsites.net/admin/functions/GetAuth",
-            //     "config": {}
-            // }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('Website Name'), '/ScheduledSync')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('Website Name'))]"
-            ]//,
-            // "properties": {
-            //     "script_root_path_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/ScheduledSync/",
-            //     "script_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/dist/ScheduledSync/index.js",
-            //     "config_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/ScheduledSync/function.json",
-            //     "href": "https://spotify-public-likes.azurewebsites.net/admin/functions/ScheduledSync",
-            //     "config": {}
-            // }
-        },
-        {
-            "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('Website Name'), '/SyncPlaylist')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', parameters('Website Name'))]"
-            ]//,
-            // "properties": {
-            //     "script_root_path_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/SyncPlaylist/",
-            //     "script_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/dist/SyncPlaylist/index.js",
-            //     "config_href": "https://spotify-public-likes.azurewebsites.net/admin/vfs/site/wwwroot/SyncPlaylist/function.json",
-            //     "href": "https://spotify-public-likes.azurewebsites.net/admin/functions/SyncPlaylist",
-            //     "config": {}
-            // }
         }
     ]
 }
