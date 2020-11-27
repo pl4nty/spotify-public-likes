@@ -1,16 +1,18 @@
 import trigger from ".";
 import Spotify from "spotify-web-api-node";
-import { CosmosClient, Items, Item, Container } from "@azure/cosmos";
+import { Items, Item } from "@azure/cosmos";
 import axios from "axios";
 
-const config = require('./../local.settings.json');
 beforeAll(async () => {
     // Import local environment variables
     // https://github.com/MicrosoftDocs/azure-docs/issues/38310#issuecomment-642722072
-    process.env = Object.assign(process.env, {
-        ...config.Values
-    });
-
+    try {
+        const config = require("./../local.settings.json");
+        process.env = Object.assign(process.env, {
+            ...config.Values
+        });
+    } catch (err) {}
+    
     Spotify.prototype.authorizationCodeGrant = jest.fn(async code => ({
         body: {
             access_token: code,
