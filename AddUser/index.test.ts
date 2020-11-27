@@ -129,3 +129,5 @@ it('rejects if the auth code is bad', async () => {
     expect(context.log.warn.mock.calls.length+context.log.error.mock.calls.length).toBeGreaterThan(0);
     expect(context.res.status).toBeGreaterThan(399);
 });
+
+// TODO integration testing (in prod?) with envvars

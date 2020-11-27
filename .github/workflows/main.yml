@@ -28,6 +28,16 @@ jobs:
 
     - name: 'Resolve Project Dependencies Using Npm'
       shell: bash
+      env:
+        SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+        SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+        COSMOSDB_ENDPOINT: ${{ secrets.COSMOSDB_ENDPOINT }}
+        COSMOSDB_KEY: ${{ secrets.COSMOSDB_KEY }}
+        COSMOSDB_DB_ID: ${{ secrets.COSMOSDB_DB_ID }}
+        COSMOSDB_CONTAINER_ID: ${{ secrets.COSMOSDB_CONTAINER_ID }}
+        FUNCTION_URL: ${{ secrets.FUNCTION_URL }}
+        FUNCTION_KEY: ${{ secrets.FUNCTION_KEY }}
+        
       run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
         npm install
