@@ -1,7 +1,7 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { Context, HttpRequest } from "@azure/functions";
 import Spotify from "spotify-web-api-node";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+export default async function (context: Context, req: HttpRequest): Promise<void> {
     if (req.body.playlist) {
         const spotify = new Spotify({
             clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -27,6 +27,4 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             offset += 20;
         } while (offset < tracks.total);
     }
-};
-
-export default httpTrigger;
+}

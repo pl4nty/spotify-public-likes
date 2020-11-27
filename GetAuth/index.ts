@@ -1,7 +1,7 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import Spotify from "spotify-web-api-node";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+export default async function (context: Context, req: HttpRequest): Promise<void> {
     const scopes = [
         'user-read-email', // read user ID and name
         'user-library-read', // read saved tracks
@@ -20,6 +20,4 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         },
         body: null
     };
-};
-
-export default httpTrigger;
+}

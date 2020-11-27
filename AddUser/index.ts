@@ -1,9 +1,9 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import { Context, HttpRequest } from "@azure/functions"
 import Spotify from "spotify-web-api-node";
 import { CosmosClient } from "@azure/cosmos";
 import axios from "axios";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
+export default async function (context: Context, req: HttpRequest): Promise<void> {
     if (req.query['code']) {
         const spotify = new Spotify({
             clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -77,7 +77,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
                 await container.item(id, id).replace(doc);
 
                 context.res = {
-                    status: 302,
+                    status: 303,
                     headers: {
                         location: `http://open.spotify.com/user/spotify/playlist/${doc.playlist}`
                     },
@@ -86,12 +86,26 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             }
         } else {
             // generic error - analytics?
+            const message = `Authorisation code is invalid`;
+            context.log.error(message)
+            context.res = {
+                status: 401,
+                body: message
+            }
         }
     } else if (req.query['error']) {
-        // display error - analytics?
+        const message = `Spotify API returned an error: ${req.query.error}`
+        context.log.error(message)
+        context.res = {
+            status: 401,
+            body: message
+        }
     } else {
-        // generic error - analytics?
+        const message = `Authorisation code not provided`
+        context.log.warn(message)
+        context.res = {
+            status: 401,
+            body: message
+        }
     }
-};
-
-export default httpTrigger;
+}

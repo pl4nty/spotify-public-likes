@@ -1,8 +1,8 @@
-import { AzureFunction, Context } from "@azure/functions";
+import { Context } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
 import axios from "axios";
 
-const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
+export default async function (context: Context, myTimer: any): Promise<void> {
     const cosmos = new CosmosClient({
         endpoint: process.env.COSMOSDB_ENDPOINT,
         key: process.env.COSMOSDB_KEY
@@ -21,6 +21,4 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
         user.last_sync = (new Date()).toISOString();
         container.item(user.id, user.id).replace(user);
     });
-};
-
-export default timerTrigger;
+}
