@@ -15,11 +15,13 @@ jobs:
       with:
         node-version: 12.x
       
-    - name: Install dependencies
+    - name: Install NPM dependencies
       run: npm ci
+      
+    - name: Start CosmosDB Emulator
+      uses: southpolesteve/cosmos-emulator-github-action@v1
 
     - name: Run tests
-      uses: southpolesteve/cosmos-emulator-github-action@v1
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
