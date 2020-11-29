@@ -60,7 +60,7 @@ export default async function (context: Context, req: HttpRequest): Promise<void
 
                 // Trigger sync to new playlist
                 try {
-                    axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
+                    await axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
                         access_token,
                         refresh_token,
                         playlist,
