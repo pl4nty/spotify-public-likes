@@ -23,13 +23,15 @@ beforeAll(async () => {
         });
     } catch (err) {}
     
+    // Create test database if needed
     const cosmos = getCosmosClient();
-    const db = (await cosmos.databases.create({ id: process.env.COSMOSDB_DB_ID })).database;
-    await db.containers.create({
+    const db = (await cosmos.databases.createIfNotExists({ id: process.env.COSMOSDB_DB_ID })).database;
+    await db.containers.createIfNotExists({
         id: process.env.COSMOSDB_CONTAINER_ID,
         partitionKey: "/id"
     });
     
+    // Mock Spotify API responses
     Spotify.prototype.authorizationCodeGrant = jest.fn(async () => ({
         body: {
             access_token: "access_token",
@@ -72,9 +74,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+    // Clean up test collection
     const cosmos = getCosmosClient();
-    await cosmos.database(process.env.COSMOSDB_DB_ID).delete();
-})
+    await cosmos.database(process.env.COSMOSDB_DB_ID).container(process.env.COSMOSDB_CONTAINER_ID).delete();
+});
 
 it('adds new users', async () => {
     Items.prototype.create = jest.fn(Items.prototype.create);
