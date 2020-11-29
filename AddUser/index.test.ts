@@ -96,7 +96,7 @@ it('adds new users', async () => {
     expect(Spotify.prototype.createPlaylist).toBeCalled();
     expect(Items.prototype.create).toBeCalled();
     expect(axios.post).toBeCalled();
-    expect(cosmos.database(process.env.COSMOSDB_DB_ID).container(process.env.COSMOSDB_CONTAINER_ID).item("id")).toBeTruthy();
+    expect(await cosmos.database(process.env.COSMOSDB_DB_ID).container(process.env.COSMOSDB_CONTAINER_ID).item("id").read()).toBeTruthy();
 });
 
 it('updates existing users', async () => {
