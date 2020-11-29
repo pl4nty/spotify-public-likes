@@ -1,5 +1,7 @@
 # Spotify Public Likes
-![Build and deploy to Azure](https://github.com/pl4nty/spotify-public-likes/workflows/Build%20and%20deploy%20to%20Azure/badge.svg)
+![Website status](https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https%3A%2F%2Fspotify.tplant.com.au%2F&logo=microsoft-azure&logoColor=white)
+![Build status](https://img.shields.io/github/workflow/status/pl4nty/spotify-public-likes/Build%20and%20deploy%20to%20Azure?logo=github&logoColor=white)
+![Test coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/pl4nty/342ee9e95e5604afaa2ee223f30f4dbd/raw/coverage.json)
 
 Source code for some Azure Functions that sync liked Spotify songs to a public playlist, using CosmosDB for state.
 

@@ -7,7 +7,7 @@
     "watch": "tsc -w",
     "prestart": "npm run build",
     "start": "func start",
-    "test": "npx jest"
+    "test": "npx jest --coverage"
   },
   "dependencies": {
     "@azure/cosmos": "^3.9.3",
