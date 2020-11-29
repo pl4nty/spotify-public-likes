@@ -17,6 +17,7 @@ export default async function (context: Context, req: HttpRequest): Promise<void
 
         // Paginate through liked tracks, adding any additions since last sync
         // TODO check if responses are sorted by date, for optimisations
+        // TODO remove songs!
         const lastSync = new Date(req.body.last_sync);
         let offset = 0;
         let tracks;

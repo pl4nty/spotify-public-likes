@@ -2,6 +2,7 @@ import { Context, HttpRequest } from "@azure/functions"
 import Spotify from "spotify-web-api-node";
 import { CosmosClient } from "@azure/cosmos";
 import axios from "axios";
+import https from "https";
 
 export default async function (context: Context, req: HttpRequest): Promise<void> {
     if (req.query['code']) {
@@ -21,7 +22,10 @@ export default async function (context: Context, req: HttpRequest): Promise<void
 
             const cosmos = new CosmosClient({
                 endpoint: process.env.COSMOSDB_ENDPOINT,
-                key: process.env.COSMOSDB_KEY
+                key: process.env.COSMOSDB_KEY,
+                agent: process.env.NODE_ENV === 'test' ? new https.Agent({
+                    rejectUnauthorized: false
+                }) : new https.Agent()
             });
             const db = cosmos.database(process.env.COSMOSDB_DB_ID);
             const container = db.container(process.env.COSMOSDB_CONTAINER_ID);
@@ -55,12 +59,16 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                 });
 
                 // Trigger sync to new playlist
-                axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
-                    access_token,
-                    refresh_token,
-                    playlist,
-                    last_sync: 0 // sync all tracks
-                });
+                try {
+                    axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
+                        access_token,
+                        refresh_token,
+                        playlist,
+                        last_sync: 0 // sync all tracks
+                    });
+                } catch (err) {
+                    context.log.error(`Added ${user.id} but couldn't start sync`)
+                }
                 
                 context.res = {
                     status: 302,

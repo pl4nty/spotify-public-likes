@@ -7,5 +7,6 @@
     "sourceMap": true,
     "strict": false,
     "esModuleInterop": true // Support Spotify API lib
-  }
+  },
+  "exclude": ["*/*.test.ts"]
 }

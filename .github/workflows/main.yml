@@ -3,53 +3,41 @@ name: Build and deploy to Azure
 on:
   [push, pull_request, workflow_dispatch]
 
-# CONFIGURATION
-# For help, go to https://github.com/Azure/Actions
-#
-# 1. Set up the following secrets in your repository:
-#   AZURE_FUNCTIONAPP_PUBLISH_PROFILE
-#
-# 2. Change these variables for your configuration:
-env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'          # set this to the path to your web app project, defaults to the repository root
-  NODE_VERSION: '12.x'                         # set this to the node version to use (supports 8.x, 10.x, 12.x)
-
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-    - name: 'Checkout GitHub Action'
+    - name: Checkout
       uses: actions/checkout@master
 
-    - name: Setup Node ${{ env.NODE_VERSION }} Environment
+    - name: Setup node
       uses: actions/setup-node@v1
       with:
-        node-version: ${{ env.NODE_VERSION }}
+        node-version: 12.x
+      
+    - name: Install dependencies
+      run: npm ci
 
-    - name: 'Resolve Project Dependencies Using Npm'
-      shell: bash
+    - name: Run tests
+      uses: southpolesteve/cosmos-emulator-github-action@v1
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
-        COSMOSDB_ENDPOINT: ${{ secrets.COSMOSDB_ENDPOINT }}
-        COSMOSDB_KEY: ${{ secrets.COSMOSDB_KEY }}
-        COSMOSDB_DB_ID: ${{ secrets.COSMOSDB_DB_ID }}
-        COSMOSDB_CONTAINER_ID: ${{ secrets.COSMOSDB_CONTAINER_ID }}
+        COSMOSDB_ENDPOINT: https://localhost:8081
+        COSMOSDB_KEY: C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==
+        COSMOSDB_DB_ID: spotify
+        COSMOSDB_CONTAINER_ID: users
         FUNCTION_URL: ${{ secrets.FUNCTION_URL }}
         FUNCTION_KEY: ${{ secrets.FUNCTION_KEY }}
-        
-      run: |
-        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        npm install
-        npm run build --if-present
-        npm run test --if-present
-        popd
-    - name: 'Run Azure Functions Action'
+      run: npm run test
+
+    - name: Build project
+      run: npm run build
+      
+    - name: Deploy to Azure function
       uses: Azure/functions-action@v1
       id: fa
       with:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-        package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        package: .
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
-
-# For more samples to get started with GitHub Action workflows to deploy to Azure, refer to https://github.com/Azure/actions-workflow-samples

@@ -1,7 +1,17 @@
 import trigger from ".";
 import Spotify from "spotify-web-api-node";
-import { Items, Item } from "@azure/cosmos";
+import { CosmosClient, Items, Item } from "@azure/cosmos";
 import axios from "axios";
+import https from "https";
+
+const getCosmosClient = () => new CosmosClient({
+    endpoint: process.env.COSMOSDB_ENDPOINT,
+    key: process.env.COSMOSDB_KEY,
+    // Disable SSL checks to allow self-signed local cert
+    agent: new https.Agent({
+        rejectUnauthorized: false
+    })
+});
 
 beforeAll(async () => {
     // Import local environment variables
@@ -13,11 +23,18 @@ beforeAll(async () => {
         });
     } catch (err) {}
     
-    Spotify.prototype.authorizationCodeGrant = jest.fn(async code => ({
+    const cosmos = getCosmosClient();
+    const db = (await cosmos.databases.create({ id: process.env.COSMOSDB_DB_ID })).database;
+    await db.containers.create({
+        id: process.env.COSMOSDB_CONTAINER_ID,
+        partitionKey: "/id"
+    });
+    
+    Spotify.prototype.authorizationCodeGrant = jest.fn(async () => ({
         body: {
-            access_token: code,
+            access_token: "access_token",
             expires_in: 1,
-            refresh_token: "dummy_refresh",
+            refresh_token: "refresh_token",
             scope: [
                 'user-read-email',
                 'user-library-read',
@@ -28,25 +45,23 @@ beforeAll(async () => {
         ...{} as any
     }));
 
-    Spotify.prototype.getMe = jest.fn(async function() {
-        return {
-            body: {
-                display_name: "",
-                external_urls: {
-                    spotify: ""
-                },
-                href: "",
-                id: this.getAccessToken(),
-                type: "user",
-                uri: "",
-                birthdate: "01-01-1970",
-                country: "Australia",
-                email: "test@test.com",
-                product: ""
+    Spotify.prototype.getMe = jest.fn(async () => ({
+        body: {
+            display_name: "",
+            external_urls: {
+                spotify: ""
             },
-            ...{} as any
-        }
-    });
+            href: "",
+            id: "id",
+            type: "user",
+            uri: "",
+            birthdate: "01-01-1970",
+            country: "Australia",
+            email: "test@test.com",
+            product: ""
+        },
+        ...{} as any
+    }));
 
     Spotify.prototype.createPlaylist = jest.fn(async () => ({
         body: {
@@ -56,14 +71,13 @@ beforeAll(async () => {
     }));
 });
 
+afterAll(async () => {
+    const cosmos = getCosmosClient();
+    await cosmos.database(process.env.COSMOSDB_DB_ID).delete();
+})
+
 it('adds new users', async () => {
-    Items.prototype.query = jest.fn(() => ({
-        fetchNext: async () => ({
-            resources: []
-        }),
-        ...{} as any
-    }));
-    Items.prototype.create = jest.fn();
+    Items.prototype.create = jest.fn(Items.prototype.create);
     axios.post = jest.fn(_ => ({} as any));
 
     const authCode = "dummycode";
@@ -76,25 +90,17 @@ it('adds new users', async () => {
         },
         url: `${process.env.FUNCTION_URL}/AddUser?code=${authCode}`
     });
+    
+    const cosmos = getCosmosClient();
 
     expect(Spotify.prototype.createPlaylist).toBeCalled();
     expect(Items.prototype.create).toBeCalled();
     expect(axios.post).toBeCalled();
+    expect(cosmos.database(process.env.COSMOSDB_DB_ID).container(process.env.COSMOSDB_CONTAINER_ID).item("id")).toBeTruthy();
 });
 
 it('updates existing users', async () => {
-    const user = {
-        refresh_token: "old_token",
-        ...{} as any
-    }
-    Items.prototype.query = jest.fn(() => ({
-        fetchNext: async () => ({
-            resources: [user]
-        }),
-        ...{} as any
-    }));
-    Item.prototype.read = jest.fn(() => ({ resource: user }) as any);
-    Item.prototype.replace = jest.fn();
+    Item.prototype.replace = jest.fn(Item.prototype.replace);
 
     const authCode = "dummycode";
     await trigger({} as any, {
@@ -129,5 +135,3 @@ it('rejects if the auth code is bad', async () => {
     expect(context.log.warn.mock.calls.length+context.log.error.mock.calls.length).toBeGreaterThan(0);
     expect(context.res.status).toBeGreaterThan(399);
 });
-
-// TODO integration testing (in prod?) with envvars
