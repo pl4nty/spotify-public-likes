@@ -6,7 +6,12 @@
             "command": "host start",
             "problemMatcher": "$func-node-watch",
             "isBackground": true,
-            "dependsOn": "npm build"
+            "dependsOn": "npm build",
+            "options": {
+                "env": {
+                    "NODE_ENV": "test"
+                }
+            }
         },
         {
             "type": "shell",

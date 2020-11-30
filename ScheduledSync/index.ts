@@ -1,11 +1,15 @@
 import { Context } from "@azure/functions";
 import { CosmosClient } from "@azure/cosmos";
 import axios from "axios";
+import https from "https";
 
 export default async function (context: Context, myTimer: any): Promise<void> {
     const cosmos = new CosmosClient({
         endpoint: process.env.COSMOSDB_ENDPOINT,
-        key: process.env.COSMOSDB_KEY
+        key: process.env.COSMOSDB_KEY,
+        agent: process.env.NODE_ENV === 'test' ? new https.Agent({
+            rejectUnauthorized: false
+        }) : new https.Agent()
     });
     const db = cosmos.database(process.env.COSMOSDB_DB_ID);
     const container = db.container(process.env.COSMOSDB_CONTAINER_ID);

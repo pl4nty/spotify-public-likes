@@ -1,7 +1,6 @@
 import trigger from ".";
 import Spotify from "spotify-web-api-node";
 import { CosmosClient, Items, Item } from "@azure/cosmos";
-import axios from "axios";
 import https from "https";
 
 const getCosmosClient = () => new CosmosClient({

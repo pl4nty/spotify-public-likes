@@ -27,8 +27,12 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                     rejectUnauthorized: false
                 }) : new https.Agent()
             });
-            const db = cosmos.database(process.env.COSMOSDB_DB_ID);
-            const container = db.container(process.env.COSMOSDB_CONTAINER_ID);
+
+            const db = (await cosmos.databases.createIfNotExists({ id: process.env.COSMOSDB_DB_ID })).database;
+            const container = (await db.containers.createIfNotExists({
+                id: process.env.COSMOSDB_CONTAINER_ID,
+                partitionKey: "/id"
+            })).container;
 
             // Get user details
             const user = (await spotify.getMe()).body;
@@ -44,7 +48,7 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                 // Create sync playlist
                 // @ts-ignore as types haven't been updated to v5 yet
                 const p = await spotify.createPlaylist(`${user.display_name}'s Likes`, {
-                    description: `Songs liked by ${user.display_name}, synced by spotify.tplant.com.au`,
+                    description: `Songs liked by ${user.display_name}, synced by ${process.env.FUNCTION_URL}`,
                     public: true
                 });
 
@@ -67,7 +71,7 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                         last_sync: 0 // sync all tracks
                     });
                 } catch (err) {
-                    context.log.error(`Added ${user.id} but couldn't start sync`)
+                    context.log.error(`Added ${user.id} but couldn't start sync: ${err}`)
                 }
                 
                 context.res = {
@@ -93,7 +97,6 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                 };
             }
         } else {
-            // generic error - analytics?
             const message = `Authorisation code is invalid`;
             context.log.error(message)
             context.res = {
