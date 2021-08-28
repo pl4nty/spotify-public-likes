@@ -1,22 +1,22 @@
 # Spotify Public Likes
-![Website status](https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https%3A%2F%2Fspotify.tplant.com.au%2F&logo=microsoft-azure&logoColor=white)
-![Build status](https://img.shields.io/github/workflow/status/pl4nty/spotify-public-likes/Build%20and%20deploy%20to%20Azure?logo=github&logoColor=white)
+[![Website status](https://img.shields.io/website?down_color=red&down_message=offline&up_color=success&up_message=online&url=https%3A%2F%2Fspotify-public-likes.lab.tplant.com.au%2F&logo=microsoft-azure&logoColor=white)](https://spotify-public-likes.lab.tplant.com.au/)
+[![Build status](https://img.shields.io/github/workflow/status/pl4nty/spotify-public-likes/Build,%20test%20and%20deploy?logo=github&logoColor=white)](https://github.com/pl4nty/spotify-public-likes/actions/workflows/main.yml)
 ![Test coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/pl4nty/342ee9e95e5604afaa2ee223f30f4dbd/raw/coverage.json)
 
 Source code for some Azure Functions that sync liked Spotify songs to a public playlist, using CosmosDB for state.
 
-[![Sign up with Spotify](https://github.com/pl4nty/spotify-public-likes/blob/main/signup.png?raw=true)](https://spotify.tplant.com.au/)
+[![Sign up with Spotify](https://github.com/pl4nty/spotify-public-likes/blob/main/signup.png?raw=true)](https://spotify-public-likes.lab.tplant.com.au/)
 
 Want to stop the sync? Just delete the public playlist.
 
-# Self-hosting
+## Self-hosting
 Note that Functions are hosted on the cheaper Consumption plan by default, so can't be hosted in a VNet and require CosmosDB to be open to the internet.
-## Prerequisites
+### Prerequisites
 * Azure account
 * Spotify account
 * [Spotify application](https://developer.spotify.com/documentation/general/guides/app-settings/)
 
-## Setup
+### Setup
 1. Fork this repo
 2. [Click here to deploy to Azure](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fpl4nty%2Fspotify-public-likes%2Fmain%2Fazuredeploy.json)
 3. [Add a custom domain](https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain#map-your-domain) and [enable SSL](https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#secure-a-custom-domain) (optional)
