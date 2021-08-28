@@ -1,4 +1,4 @@
-name: Build and deploy
+name: Build, test and deploy
 
 on:
   push:
@@ -62,6 +62,7 @@ jobs:
         name: dist-without-src
         path: |
           .
+          !node_modules
           !./**/*.ts
     
     - name: Archive coverage summary
