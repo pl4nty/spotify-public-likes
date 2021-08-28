@@ -39,13 +39,13 @@ jobs:
       run: npm install
 
     - name: Build project
-      run: npm build
+      run: npm run build
       
     - name: Start CosmosDB emulator
       uses: southpolesteve/cosmos-emulator-github-action@v1
 
     - name: Run tests
-      run: npm test
+      run: npm run test
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
@@ -56,14 +56,13 @@ jobs:
         FUNCTION_URL: ${{ secrets.FUNCTION_URL }}
         FUNCTION_KEY: ${{ secrets.FUNCTION_KEY }}
       
-    - name: Archive build without source
+    - name: Archive build without sourcemaps
       uses: actions/upload-artifact@v2
       with:
         name: dist-without-src
         path: |
-          .
-          !node_modules
-          !./**/*.ts
+          dist
+          !dist/*.map
     
     - name: Archive coverage summary
       uses: actions/upload-artifact@v2
