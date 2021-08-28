@@ -1,14 +1,22 @@
-name: Build and deploy to Azure
+name: Build and deploy
 
 on:
-  [push, pull_request, workflow_dispatch]
+  push:
+    branches:
+    - master
+  pull_request_target:
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: windows-latest
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed' && github.actor == 'dependabot[bot]')
+    name: Build and deploy to Azure
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup node
       uses: actions/setup-node@v1
@@ -53,7 +61,7 @@ jobs:
     - name: Build project
       run: npm run build
       
-    - name: Deploy to Azure function
+    - name: Deploy to Azure Function
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
