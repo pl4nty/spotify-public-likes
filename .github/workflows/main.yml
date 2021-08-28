@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build_and_test:
     runs-on: windows-latest
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed' && github.actor == 'dependabot[bot]')
-    name: Build and deploy to Azure
+    name: Build and deploy to Azure  
     steps:
     - uses: actions/checkout@v2
       with:
@@ -42,8 +42,30 @@ jobs:
         FUNCTION_KEY: ${{ secrets.FUNCTION_KEY }}
       run: npm run test
       
+    - name: Archive build without source
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist-without-src
+        path: |
+          .
+          !./**/*.ts
+    
+    - name: Archive coverage summary
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-summary
+        path: coverage/coverage-summary.json
+    
+  deploy:
+    runs-on: windows-latest
+    if: github.event_name == 'push' && ${GITHUB_REF##*/} == 'main'
+    name: Deploy to Azure  
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      
     - name: Parse coverage data
-      run: echo "PERCENT=$((Get-Content coverage\coverage-summary.json | Out-String | ConvertFrom-Json).total.lines.pct)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      run: echo "PERCENT=$((Get-Content coverage-summary\coverage-summary.json | Out-String | ConvertFrom-Json).total.lines.pct)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Update coverage badge
       uses: schneegans/dynamic-badges-action@v1.0.0
@@ -65,5 +87,5 @@ jobs:
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-        package: .
+        package: dist-without-src
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
