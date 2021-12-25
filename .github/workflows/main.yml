@@ -37,15 +37,14 @@ jobs:
 
     - name: Remove dev dependencies
       run: npm prune --production
+
+    - run: mv node_modules dist/node_modules
       
     - name: Archive build without sourcemaps
       uses: actions/upload-artifact@v2
       with:
-        name: build
-        path: |
-          dist/**
-          !dist/**/*.map
-          node_modules
+        name: dist
+        path: dist
     
     - name: Archive coverage summary
       uses: actions/upload-artifact@v2
@@ -80,5 +79,5 @@ jobs:
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-        package: build
+        package: dist
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
