@@ -12,23 +12,19 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Setup Node
-      uses: actions/setup-node@v2
+    - uses: actions/setup-node@v2
       with:
         node-version: 12
         cache: npm
       
-    - name: Install dependencies
-      run: npm install --production=false
+    - run: npm install --production=false
 
-    - name: Build
-      run: npm run build
+    - run: npm run build
       
     - name: Setup CosmosDB emulator
       uses: southpolesteve/cosmos-emulator-github-action@v1
 
-    - name: Run tests
-      run: npm test
+    - run: npm test
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
@@ -45,9 +41,9 @@ jobs:
     - name: Archive build without sourcemaps
       uses: actions/upload-artifact@v2
       with:
-        name: dist-without-src
+        name: build
         path: |
-          dist/*
+          dist/**/*
           !dist/**/*.map
           node_modules
     
@@ -62,14 +58,13 @@ jobs:
     runs-on: windows-latest
     name: Deploy to Azure  
     steps:
-    - name: Download artifacts
-      uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v2
       
     - name: Parse coverage data
       run: echo "PERCENT=$((Get-Content coverage-summary\coverage-summary.json | Out-String | ConvertFrom-Json).total.lines.pct)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Update coverage badge
-      uses: schneegans/dynamic-badges-action@v1.0.0
+      uses: schneegans/dynamic-badges-action@v1.1.0
       with:
         auth: ${{ secrets.BADGE_TOKEN }}
         gistID: 342ee9e95e5604afaa2ee223f30f4dbd
@@ -85,5 +80,5 @@ jobs:
       uses: Azure/functions-action@v1
       with:
         app-name: ${{ secrets.AZURE_FUNCTIONAPP_NAME }}
-        package: dist-without-src
+        package: build
         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
