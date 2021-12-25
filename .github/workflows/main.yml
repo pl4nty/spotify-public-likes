@@ -63,6 +63,7 @@ jobs:
         path: |
           dist
           !dist/*.map
+          node_modules
     
     - name: Archive coverage summary
       uses: actions/upload-artifact@v2
