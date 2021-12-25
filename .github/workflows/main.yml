@@ -39,19 +39,15 @@ jobs:
       run: npm prune --production
 
     - run: mv node_modules dist/node_modules
+    - run: mv host.json dist/host.json
+    - run: mv package.json dist/package.json
+    - run: mv dist/* dist/dist
       
     - name: Archive dist
       uses: actions/upload-artifact@v2
       with:
         name: dist
         path: dist
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: |
-          host.json
-          package.json
     
     - name: Archive coverage summary
       uses: actions/upload-artifact@v2
