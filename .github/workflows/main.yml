@@ -43,7 +43,7 @@ jobs:
       with:
         name: build
         path: |
-          dist/**/*
+          dist/**
           !dist/**/*.map
           node_modules
     
