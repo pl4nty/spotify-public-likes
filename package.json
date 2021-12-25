@@ -1,26 +1,31 @@
 {
   "name": "spotify-public-likes",
+  "private": true,
   "version": "1.0.0",
   "description": "",
+  "license": "MIT",
+  "repository": "pl4nty/spotify-public-likes",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "prestart": "npm run build",
-    "start": "func start",
+    "prestart": "npm run build && func extensions install",
+    "start:host": "func start",
+    "start": "npm run start:host & npm run watch",
+    "build:production": "npm run prestart && npm prune --production",
     "test": "npx jest --coverage"
   },
   "dependencies": {
-    "@azure/cosmos": "^3.9.3",
-    "axios": "^0.21.1",
-    "spotify-web-api-node": "^5.0.0"
+    "@azure/cosmos": "^3.15.0",
+    "axios": "^0.24.0",
+    "spotify-web-api-node": "^5.0.2"
   },
   "devDependencies": {
-    "@azure/functions": "^1.0.2-beta2",
-    "@types/jest": "^26.0.15",
-    "@types/node": "^14.14.7",
+    "@azure/functions": "^1.2.3",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^14.18.2",
     "@types/spotify-web-api-node": "^4.0.2",
     "jest": "^26.6.3",
-    "ts-jest": "^26.4.4",
-    "typescript": "^3.3.3"
+    "ts-jest": "^26.5.6",
+    "typescript": "^3.9.10"
   }
 }
