@@ -2,50 +2,33 @@ name: Build, test and deploy
 
 on:
   push:
-    branches:
-    - main
-  pull_request_target:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build_and_test:
     runs-on: windows-latest
-    if: github.event_name != 'pull_request_target' || github.actor == 'dependabot[bot]'
     name: Build and test
     steps:
     - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-      
-    - name: Cache node modules
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-node-modules
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
 
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: 12.x
+        node-version: 12
+        cache: npm
       
-    - name: Install NPM dependencies
-      run: npm install
+    - name: Install dependencies
+      run: npm install --production=false
 
-    - name: Build project
+    - name: Build
       run: npm run build
       
-    - name: Start CosmosDB emulator
+    - name: Setup CosmosDB emulator
       uses: southpolesteve/cosmos-emulator-github-action@v1
 
     - name: Run tests
-      run: npm run test
+      run: npm test
       env:
         SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
         SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
@@ -55,14 +38,17 @@ jobs:
         COSMOSDB_CONTAINER_ID: users
         FUNCTION_URL: ${{ secrets.FUNCTION_URL }}
         FUNCTION_KEY: ${{ secrets.FUNCTION_KEY }}
+
+    - name: Remove dev dependencies
+      run: npm prune --production
       
     - name: Archive build without sourcemaps
       uses: actions/upload-artifact@v2
       with:
         name: dist-without-src
         path: |
-          dist
-          !dist/*.map
+          dist/*
+          !dist/**/*.map
           node_modules
     
     - name: Archive coverage summary
@@ -74,7 +60,6 @@ jobs:
   deploy:
     needs: build_and_test
     runs-on: windows-latest
-    if: github.event_name != 'pull_request_target'
     name: Deploy to Azure  
     steps:
     - name: Download artifacts
