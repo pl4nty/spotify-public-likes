@@ -111,7 +111,14 @@ it('updates existing users', async () => {
     Item.prototype.replace = jest.fn(Item.prototype.replace);
 
     const authCode = "dummycode";
-    await trigger({} as any, {
+    const context = {
+        log: {
+            warn: jest.fn(),
+            error: jest.fn()
+        },
+        ...{} as any
+    };
+    await trigger(context, {
         headers: {},
         method: "GET",
         params: {},
