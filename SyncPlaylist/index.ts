@@ -30,7 +30,8 @@ export default async function (context: Context, req: HttpRequest): Promise<void
         do {
             tracks = (await spotify.getMySavedTracks({ offset })).body;
             const uris = tracks.items.filter(track => new Date(track.added_at) > lastSync).map(track => track.track.uri);
-            if (uris) spotify.addTracksToPlaylist(req.body.playlist, uris);
+            if (uris.length !== 0) spotify.addTracksToPlaylist(req.body.playlist, uris, {position: 0});
+            if (uris.length < 20) break;
             offset += 20;
         } while (offset < tracks.total);
     } else {

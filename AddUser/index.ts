@@ -84,20 +84,22 @@ export default async function (context: Context, req: HttpRequest): Promise<void
             } else {
                 // Update refresh token for existing user - it might have expired
                 const { resource: doc } = await container.item(id, id).read();
-                doc.refresh_token = refresh_token;
                 
-                await container.item(id, id).replace(doc);
-
                 try {
                     await axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
                         access_token,
                         refresh_token,
                         playlist: doc.playlist,
-                        last_sync: doc.last_sync // sync all tracks
+                        last_sync: doc.last_sync
                     });
                 } catch (err) {
                     context.log.error(`Manual sync failed for user ${user.id}: ${err}`)
                 }
+
+                doc.refresh_token = refresh_token;
+                doc.last_sync = new Date().toISOString();
+                
+                await container.item(id, id).replace(doc);
 
                 context.res = {
                     status: 303,
