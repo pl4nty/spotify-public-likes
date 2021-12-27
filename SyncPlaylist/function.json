@@ -14,7 +14,6 @@
         "direction": "out",
         "name": "res"
       }
-    ],
-    "scriptFile": "../dist/SyncPlaylist/index.js"
+    ]
   }
   

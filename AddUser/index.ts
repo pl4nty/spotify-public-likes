@@ -48,7 +48,7 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                 // Create sync playlist
                 // @ts-ignore as types haven't been updated to v5 yet
                 const p = await spotify.createPlaylist(`${user.display_name}'s Likes`, {
-                    description: `Songs liked by ${user.display_name}, synced by ${process.env.FUNCTION_URL}`,
+                    description: `Synced by ${process.env.FUNCTION_URL}. Want your liked songs to be public? DM @pl4nty#5958 on Discord`,
                     public: true
                 });
 
@@ -87,6 +87,17 @@ export default async function (context: Context, req: HttpRequest): Promise<void
                 doc.refresh_token = refresh_token;
                 
                 await container.item(id, id).replace(doc);
+
+                try {
+                    await axios.post(`${process.env.FUNCTION_URL}/SyncPlaylist?code=${process.env.FUNCTION_KEY}`, {
+                        access_token,
+                        refresh_token,
+                        playlist: doc.playlist,
+                        last_sync: doc.last_sync // sync all tracks
+                    });
+                } catch (err) {
+                    context.log.error(`Manual sync failed for user ${user.id}: ${err}`)
+                }
 
                 context.res = {
                     status: 303,

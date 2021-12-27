@@ -19,8 +19,8 @@
     "@azure/cosmos": "^3.15.0",
     "axios": "^0.24.0",
     "spotify-web-api-node": "^5.0.2"
-},
-"devDependencies": {
+  },
+  "devDependencies": {
     "@azure/functions": "^1.2.3",
     "@types/jest": "^26.0.24",
     "@types/node": "^14.18.2",
