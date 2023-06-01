@@ -41,12 +41,12 @@ jobs:
     - run: mv node_modules dist/node_modules
       
     - name: Archive dist
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: dist
         path: dist
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: dist
         path: |
@@ -54,7 +54,7 @@ jobs:
           package.json
     
     - name: Archive coverage summary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: coverage-summary
         path: coverage/coverage-summary.json
