@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@azure/cosmos": "3.17.3",
-    "axios": "1.4.0",
+    "axios": "1.6.8",
     "spotify-web-api-node": "5.0.2"
   },
   "devDependencies": {
