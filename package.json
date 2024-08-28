@@ -21,7 +21,7 @@
     "spotify-web-api-node": "5.0.2"
   },
   "devDependencies": {
-    "@azure/functions": "1.2.3",
+    "@azure/functions": "4.5.1",
     "@types/jest": "29.5.4",
     "@types/node": "18.17.9",
     "@types/spotify-web-api-node": "4.0.2",
